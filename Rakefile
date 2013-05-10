@@ -4,8 +4,8 @@ require "rspec/core/rake_task"
 require "cucumber/rake/task"
 
 default_targets = []
-default_targets += :spec if Dir.exist? "spec"
-default_targets += :features if Dir.exist? "features"
+default_targets << :spec if Dir.exist? "spec"
+default_targets << :features if Dir.exist? "features"
 
 task :default => default_targets
 
