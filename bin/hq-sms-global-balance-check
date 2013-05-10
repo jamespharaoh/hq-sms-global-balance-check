@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+require "hq/sms-global/balance-check/script"
+
+script = HQ::SmsGlobal::BalanceCheck::Script.new
+script.args = ARGV
+script.main
+exit script.status
