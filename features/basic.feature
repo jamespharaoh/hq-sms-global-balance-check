@@ -10,17 +10,19 @@ Feature: Basic functionality
       </hq-sms-global-balance-check-config>
       """
 
-  Scenario: Balance ok
-
-    Given that the balance is 750
-
-    When I run the script with args:
+    Given a file "default.args":
       """
       --config default.config
       --account account
       --warning 500
       --critical 100
       """
+
+  Scenario: Balance ok
+
+    Given the balance is 750
+
+    When I run the script with "default.args"
 
     Then the status should be 0
     And the output should be:
@@ -30,15 +32,9 @@ Feature: Basic functionality
 
   Scenario: Balance warning
 
-    Given that the balance is 250
+    Given the balance is 250
 
-    When I run the script with args:
-      """
-      --config default.config
-      --account account
-      --warning 500
-      --critical 100
-      """
+    When I run the script with "default.args"
 
     Then the status should be 1
     And the output should be:
@@ -48,15 +44,9 @@ Feature: Basic functionality
 
   Scenario: Balance critical
 
-    Given that the balance is 50
+    Given the balance is 50
 
-    When I run the script with args:
-      """
-      --config default.config
-      --account account
-      --warning 500
-      --critical 100
-      """
+    When I run the script with "default.args"
 
     Then the status should be 2
     And the output should be:

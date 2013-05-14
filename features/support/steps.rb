@@ -2,33 +2,24 @@ require "shellwords"
 
 require "hq/sms-global/balance-check/script"
 
-Given /^a file "(.*?)":$/ do
-	|file_name, file_contents|
-
-	File.open file_name, "w" do
-		|file_io|
-
-		file_contents =
-			file_contents.gsub "${server-url}", $web_url
-
-		file_io.write file_contents
-
-	end
-
-end
-
-Given /^that the balance is (\d+)$/ do
+Given /^the balance is (\d+)$/ do
 	|balance_str|
 
 	$balance = balance_str.to_f
 
 end
 
-When /^I run the script with args:$/ do
-	|args_str|
+Given /^the server is offline$/ do
+
+	$status = :offline
+
+end
+
+When /^I run the script with "(.+)"$/ do
+	|args_file|
 
 	@script = HQ::SmsGlobal::BalanceCheck::Script.new
-	@script.args = Shellwords.split args_str
+	@script.args = Shellwords.split File.read(args_file)
 
 	@script.stdout = StringIO.new
 	@script.stderr = StringIO.new

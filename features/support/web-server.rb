@@ -28,13 +28,28 @@ end
 $web_server.mount_proc "/balance-api.php" do
 	|request, response|
 
-	request.query["user"].should == "USER"
-	request.query["password"].should == "PASS"
+	case $status
 
-	response.body = "BALANCE: #{$balance}; USER: USER"
+		when :online
+
+			request.query["user"].should == "USER"
+			request.query["password"].should == "PASS"
+
+			response.body = "BALANCE: #{$balance}; USER: USER"
+
+		when :offline
+
+			response.status = 500
+			response.message = "Internal server error"
+
+			response.body = "Sorry, an error occurred"
+
+	end
 
 end
 
 Before do
 	$balance = 0.0
+	$status = :online
+	$placeholders["${server-url}"] = $web_url
 end

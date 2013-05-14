@@ -6,7 +6,7 @@ $hq_project_path =
 module ::HQ
 
 	def self.project_param name
-		File.read("#{$hq_project_path}/.hq-dev/#{name}").strip
+		File.read("#{$hq_project_path}/etc/hq-dev/#{name}").strip
 	end
 
 	def self.project_include name
