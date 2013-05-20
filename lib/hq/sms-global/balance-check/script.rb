@@ -5,6 +5,7 @@ require "hq/tools/getopt"
 require "net/http"
 
 require "xml"
+require "yaml"
 
 module HQ
 module SmsGlobal
