@@ -44,6 +44,10 @@ $web_server.mount_proc "/balance-api.php" do
 
 			response.body = "Sorry, an error occurred"
 
+		when :slow
+
+			sleep 2
+
 	end
 
 end

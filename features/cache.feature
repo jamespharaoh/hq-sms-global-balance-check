@@ -21,6 +21,18 @@ Feature: Cached results
       --account account
       --warning 500
       --critical 100
+      --timeout 10
+      --cache-warning 10
+      --cache-critical 20
+      """
+
+    And a file "timeout.args":
+      """
+      --config default.config
+      --account account
+      --warning 500
+      --critical 100
+      --timeout 0
       --cache-warning 10
       --cache-critical 20
       """
@@ -41,7 +53,7 @@ Feature: Cached results
     Then the status should be 0
     And the output should be:
       """
-      SMS Global account OK: 750 credits, last check 5 seconds ago
+      SMS Global account OK: server status 500, 750 credits, last check 5 seconds ago
       """
 
   Scenario: Cache warning
@@ -54,7 +66,7 @@ Feature: Cached results
     Then the status should be 1
     And the output should be:
       """
-      SMS Global account WARNING: 750 credits, last check 15 seconds ago (warning is 10)
+      SMS Global account WARNING: server status 500, 750 credits, last check 15 seconds ago (warning is 10)
       """
 
   Scenario: Cache critical
@@ -67,5 +79,18 @@ Feature: Cached results
     Then the status should be 2
     And the output should be:
       """
-      SMS Global account CRITICAL: 750 credits, last check 25 seconds ago (critical is 20)
+      SMS Global account CRITICAL: server status 500, 750 credits, last check 25 seconds ago (critical is 20)
+      """
+
+  Scenario: Cache warning with timeout
+
+    Given the time is 115
+    And the server is slow to respond
+
+    When I run the script with "timeout.args"
+
+    Then the status should be 1
+    And the output should be:
+      """
+      SMS Global account WARNING: server timed out, 750 credits, last check 15 seconds ago (warning is 10)
       """

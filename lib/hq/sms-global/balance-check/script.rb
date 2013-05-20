@@ -33,6 +33,10 @@ class Script < Tools::CheckScript
 					:convert => :to_f,
 					:required => true },
 
+				{ :name => :timeout,
+					:convert => :to_f,
+					:required => true },
+
 				{ :name => :cache_warning,
 					:convert => :to_i },
 
@@ -76,21 +80,16 @@ class Script < Tools::CheckScript
 
 	def perform_checks
 
-		used_cache = false
+		get_balance_from_server
 
-		begin
-
-			get_balance_from_server
-
-		rescue => exception
-
-			raise exception \
-				unless @cache_elem
-
+		if @actual_balance
+			used_cache = false
+		elsif @cache_elem
 			read_cache
-
+			@unknown = false
 			used_cache = true
-
+		else
+			return
 		end
 
 		# report balance
@@ -160,21 +159,41 @@ class Script < Tools::CheckScript
 				"password" => @account_elem["password"],
 			})
 
-		Net::HTTP.start url.host, url.port do
-			|http|
+		http =
+			Net::HTTP.new url.host, url.port
+
+		http.open_timeout = @opts[:timeout]
+		http.read_timeout = @opts[:timeout]
+
+		http.start
+
+		begin
 
 			request = Net::HTTP::Get.new "#{url.path}?#{url.query}"
 
 			response = http.request request
 
-			raise "Error 1" \
-				unless response.code == "200"
+			unless response.code == "200"
+				unknown "server status #{response.code}"
+				return
+			end
 
-			raise "Error 2" \
-				unless response.body =~ /^BALANCE: ([^;]+); USER: (.+)$/
+			unless response.body =~ /^BALANCE: ([^;]+); USER: (.+)$/
+				unknown "invalid server response"
+				return
+			end
 
 			@actual_balance =
 				$1.to_f
+
+		rescue Net::ReadTimeout
+
+			unknown "server timed out"
+			return
+
+		ensure
+
+			http.finish
 
 		end
 

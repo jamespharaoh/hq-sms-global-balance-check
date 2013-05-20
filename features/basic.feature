@@ -16,6 +16,16 @@ Feature: Basic functionality
       --account account
       --warning 500
       --critical 100
+      --timeout 10
+      """
+
+    Given a file "timeout.args":
+      """
+      --config default.config
+      --account account
+      --warning 500
+      --critical 100
+      --timeout 0
       """
 
   Scenario: Balance ok
@@ -52,4 +62,16 @@ Feature: Basic functionality
     And the output should be:
       """
       SMS Global account CRITICAL: 50 credits (critical is 100)
+      """
+
+  Scenario: Read timeout
+
+    Given the server is slow to respond
+
+    When I run the script with "timeout.args"
+
+    Then the status should be 3
+    And the output should be:
+      """
+      SMS Global account UNKNOWN: server timed out
       """

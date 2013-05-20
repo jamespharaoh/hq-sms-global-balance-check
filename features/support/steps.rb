@@ -15,6 +15,12 @@ Given /^the server is offline$/ do
 
 end
 
+Given /^the server is slow to respond$/ do
+
+	$status = :slow
+
+end
+
 When /^I run the script with "(.+)"$/ do
 	|args_file|
 
@@ -36,4 +42,8 @@ end
 Then /^the output should be:$/ do
 	|expected_output|
 	@script.stdout.string.strip.should == expected_output
+end
+
+Then /^show stderr$/ do
+	puts @script.stderr.string
 end
