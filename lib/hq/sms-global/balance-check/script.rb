@@ -187,7 +187,7 @@ class Script < Tools::CheckScript
 			@actual_balance =
 				$1.to_f
 
-		rescue Net::ReadTimeout
+		rescue Timeout::Error
 
 			unknown "server timed out"
 			return
